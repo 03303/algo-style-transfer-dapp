@@ -172,6 +172,7 @@ export default class Uploader extends React.Component {
 	}
     
   render() {
+    const { isComplete, processingTx } =  this.state;
     return (
       <div style={{ flexGrow: 1 }}>
         <Grid item container justify="center" style={{ padding: 8 }}>
@@ -235,7 +236,7 @@ export default class Uploader extends React.Component {
                     allowURL={true}
                   />
                 </Grid>
-                {!this.state.isComplete && 
+                {!isComplete && 
                   <Grid item xs={12} container justify="center">
                     <SNETImageUpload
                       imageDataFunc={this.getStyleImageData}
@@ -243,7 +244,7 @@ export default class Uploader extends React.Component {
                       maxImageSize={3000000}
                       maxImageWidth={2400}
                       maxImageHeight={1800}
-                      disableResetButton={this.state.isComplete}
+                      disableResetButton={isComplete}
                       width="90%"
                       instantUrlFetch={true}
                       allowURL={true}
@@ -252,7 +253,7 @@ export default class Uploader extends React.Component {
                   </Grid>
                 }
               </Grid>
-              {!this.state.isComplete && 
+              {!isComplete && 
                 <Grid item container justify="center" style={{ paddingTop: 16 }}>
                   <Grid item>
                     <Button
@@ -263,12 +264,12 @@ export default class Uploader extends React.Component {
                       onClick={this.runService}
                       disabled={!this.canBeInvoked()}
                     >
-                    Run
+                    {processingTx ? "Plese Wait" : "Run"}
                     </Button>
                   </Grid>
                 </Grid>
               }
-              {this.state.isComplete && 
+              {isComplete && 
                 <Grid item container justify="center" style={{ paddingTop: 16 }}>
                     <Grid item>
                         <Button
