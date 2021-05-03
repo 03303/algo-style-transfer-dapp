@@ -24,6 +24,8 @@ import HoverIcon from "./HoverIcon";
 import SNETImageUpload from "./SNETImageUpload";
 
 const STYLE_TRANSFER_ACCOUNT = 'JTEAQYLZW22LQUB2AOQXGG2SQM3K7FWABHFKKF24GLP5EGEZ5YVYJSFKDY'
+const STYLE_TRANSFER_PRICE = 10000
+const STYLE_TRANSFER_NOTE = 'AlgorandStyleTransfer'
 
 const initialUserInput = {
   // Actual inputs
@@ -44,12 +46,10 @@ export default class Uploader extends React.Component {
 
     this.state = {
       ...initialUserInput,
-      algoSigner: undefined,
+      useAlgoSigner: false,
       accounts: [],
       processingTx: false,
       isComplete: false,
-      serviceName: "StyleTransfer",
-      methodName: "transfer_image_style",
       response: undefined,
     };
 
@@ -72,7 +72,7 @@ export default class Uploader extends React.Component {
       "https://raw.githubusercontent.com/singnet/style-transfer-service/master/docs/assets/examples/en_campo_gris_cropped.jpg",
     ];
 
-    this.submitAction = this.submitAction.bind(this);
+    this.runService = this.runService.bind(this);
     this.canBeInvoked = this.canBeInvoked.bind(this);
     this.reset = this.reset.bind(this);
 
@@ -134,31 +134,34 @@ export default class Uploader extends React.Component {
 		const ok = await AlgoSignerConnect();
 		if (ok) {
 			const accounts = await AlgoSignerAccounts();
-			this.setState({ algoSigner: ok, accounts: accounts });
+			this.setState({ useAlgoSigner: true, accounts: accounts });
 		}
 	}
 
-	submitAction = async () => {
+	runService = async () => {
     try {
-    const { accounts, content, style } = this.state;
-    const params = {
-      from: accounts[0]['address'],
-      to: STYLE_TRANSFER_ACCOUNT,
-      amount: 1,
-      note: 'AlgorandStyleTransfer'
-    };
-    this.setState({ processingTx: true });
-    const signedTx = await AlgoSignerSign(params);
-    const sentTx = await AlgoSignerSendTx(signedTx);
-    const txStatus = await AlgoSignerCheckTx(sentTx);
-    if (txStatus) {
-      const response = await GetStyleTransferResponse(content, style);
-      if (response && response.data) {
-        this.setState({ isComplete: true, response: response.data.output });
+      const { useAlgoSigner, accounts, content, style } = this.state;
+      if (useAlgoSigner && accounts.length) {
+        const params = {
+          from: accounts[0]['address'],
+          to: STYLE_TRANSFER_ACCOUNT,
+          amount: STYLE_TRANSFER_PRICE,
+          note: STYLE_TRANSFER_NOTE
+        };
+        this.setState({ processingTx: true });
+        const signedTx = await AlgoSignerSign(params);
+        const sentTx = await AlgoSignerSendTx(signedTx);
+        const txStatus = await AlgoSignerCheckTx(sentTx);
+        if (txStatus) {
+          const response = await GetStyleTransferResponse(content, style);
+          if (response && response.data) {
+            this.setState({ isComplete: true, response: response.data.output });
+          }
+        }
+      } else {
+        alert('AlgoSigner not installed!\nhttps://www.purestake.com/technology/algosigner/')
       }
-    }
-    }
-    catch(e) {
+    } catch(e) {
       console.error(e)
     }
     this.setState({ processingTx: false });
@@ -181,7 +184,7 @@ export default class Uploader extends React.Component {
             }}
           >
             <MuiThemeProvider theme={this.theme}>
-              <Grid container spacing={8} justify="center" alignItems="center">
+              <Grid container spacing={0} justify="center" alignItems="center">
                 <Grid item xs={12} container alignItems="center" justify="space-between">
                   <Grid item>
                     <Typography
@@ -251,18 +254,18 @@ export default class Uploader extends React.Component {
               </Grid>
               {!this.state.isComplete && 
                 <Grid item container justify="center" style={{ paddingTop: 16 }}>
-                    <Grid item>
-                        <Button
-                          variant="contained"
-                          size="medium"
-                          color="primary"
-                          style={{ fontSize: "13px", marginLeft: "10px" }}
-                          onClick={this.submitAction}
-                          disabled={!this.canBeInvoked()}
-                        >
-                        Start
-                        </Button>
-                    </Grid>
+                  <Grid item>
+                    <Button
+                      variant="contained"
+                      size="medium"
+                      color="primary"
+                      style={{ fontSize: "13px", marginLeft: "10px" }}
+                      onClick={this.runService}
+                      disabled={!this.canBeInvoked()}
+                    >
+                    Run
+                    </Button>
+                  </Grid>
                 </Grid>
               }
               {this.state.isComplete && 
