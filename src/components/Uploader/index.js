@@ -264,7 +264,7 @@ export default class Uploader extends React.Component {
                       onClick={this.runService}
                       disabled={!this.canBeInvoked()}
                     >
-                    {processingTx ? "Plese Wait" : "Run"}
+                    {processingTx ? "Please Wait" : "Run"}
                     </Button>
                   </Grid>
                 </Grid>
