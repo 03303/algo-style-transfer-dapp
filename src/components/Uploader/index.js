@@ -11,9 +11,9 @@ import grey from "@material-ui/core/es/colors/grey";
 import red from "@material-ui/core/es/colors/red";
 
 import {
-	AlgoSignerConnect,
-	AlgoSignerAccounts,
-	AlgoSignerSign,
+  AlgoSignerConnect,
+  AlgoSignerAccounts,
+  AlgoSignerSign,
   AlgoSignerSendTx,
   AlgoSignerCheckTx
 } from '../../AlgoSigner';
@@ -129,16 +129,16 @@ export default class Uploader extends React.Component {
     return this.state.content && this.state.style && !this.state.processingTx;
   }
 
-	// Set AlgoSigner, asking for users access
-	setup = async () => {
-		const ok = await AlgoSignerConnect();
-		if (ok) {
-			const accounts = await AlgoSignerAccounts();
-			this.setState({ useAlgoSigner: true, accounts: accounts });
-		}
-	}
+  // Set AlgoSigner, asking for users to grant access.
+  setup = async () => {
+    const ok = await AlgoSignerConnect();
+    if (ok) {
+      const accounts = await AlgoSignerAccounts();
+      this.setState({ useAlgoSigner: true, accounts: accounts });
+    }
+  }
 
-	runService = async () => {
+  runService = async () => {
     try {
       const { useAlgoSigner, accounts, content, style } = this.state;
       if (useAlgoSigner && accounts.length) {
@@ -165,11 +165,11 @@ export default class Uploader extends React.Component {
       console.error(e)
     }
     this.setState({ processingTx: false });
-	}
+  }
 
-	async componentDidMount() {
-		await this.setup();
-	}
+  async componentDidMount() {
+    await this.setup();
+  }
     
   render() {
     const { isComplete, processingTx } =  this.state;
