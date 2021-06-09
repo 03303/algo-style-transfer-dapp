@@ -126,7 +126,7 @@ export default class Uploader extends React.Component {
   }
 
   canBeInvoked() {
-    return this.state.content && this.state.style && !this.state.processingTx;
+    return this.state.useAlgoSigner && this.state.content && this.state.style && !this.state.processingTx;
   }
 
   // Set AlgoSigner, asking for users to grant access.
@@ -135,6 +135,8 @@ export default class Uploader extends React.Component {
     if (ok) {
       const accounts = await AlgoSignerAccounts();
       this.setState({ useAlgoSigner: true, accounts: accounts });
+    } else {
+      alert('AlgoSigner is not installed or no access granted!');
     }
   }
 
